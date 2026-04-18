@@ -1,73 +1,81 @@
-import tkinter as tk
-import random
-import math
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>❤️</title>
+<style>
+body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+}
+.text {
+    position: absolute;
+    font-size: 14px;
+    color: pink;
+}
+</style>
+</head>
+<body>
 
-# 文本内容（可以自己改）
-texts = [
-    "我想你了", "爱你", "好好吃饭", "早点睡",
-    "保持开心", "天天开心", "顺顺利利",
-    "我在", "别熬夜", "爱你三千遍"
-]
+<script>
+const texts = ["我想你了","爱你","早点睡","好好吃饭","我在","别熬夜","天天开心"];
 
-root = tk.Tk()
-root.title("❤️")
-root.attributes("-fullscreen", True)
-root.configure(bg="black")
+let elements = [];
 
-width = root.winfo_screenwidth()
-height = root.winfo_screenheight()
+// ❤️ 爱心坐标
+function heart(t) {
+    let x = 16 * Math.pow(Math.sin(t),3);
+    let y = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
+    return {x,y};
+}
 
-labels = []
+// 生成爱心（直接出现）
+function createHeart() {
+    for(let i=0;i<200;i++){
+        let t = Math.random()*Math.PI*2;
+        let p = heart(t);
 
-# ❤️ 生成爱心坐标（直接成型）
-def heart_points(scale=12):
-    points = []
-    for t in range(0, 360, 5):
-        t = math.radians(t)
-        x = 16 * math.sin(t)**3
-        y = -(13 * math.cos(t)
-              - 5 * math.cos(2*t)
-              - 2 * math.cos(3*t)
-              - math.cos(4*t))
-        points.append((x * scale + width/2, y * scale + height/2))
-    return points
+        let el = document.createElement("div");
+        el.className = "text";
+        el.innerText = texts[Math.floor(Math.random()*texts.length)];
 
-# 🎯 创建爱心（直接出现）
-def create_heart():
-    pts = heart_points()
-    for (x, y) in pts:
-        text = random.choice(texts)
-        label = tk.Label(root, text=text,
-                         fg=random.choice(["#ff4d6d","#ff66cc","#66ffcc","#ffff66","#66ccff"]),
-                         bg="black", font=("微软雅黑", 12))
-        label.place(x=x, y=y)
-        labels.append(label)
+        el.style.left = (window.innerWidth/2 + p.x*10) + "px";
+        el.style.top = (window.innerHeight/2 + p.y*10) + "px";
 
-# 💥 爱心直接消失
-def remove_heart():
-    for lbl in labels:
-        lbl.destroy()
-    labels.clear()
+        document.body.appendChild(el);
+        elements.push(el);
+    }
+}
 
-# 🎲 随机飘字
-def random_text():
-    text = random.choice(texts)
-    label = tk.Label(root, text=text,
-                     fg=random.choice(["#ff4d6d","#ff66cc","#66ffcc","#ffff66","#66ccff"]),
-                     bg="black", font=("微软雅黑", random.randint(10,18)))
-    x = random.randint(0, width)
-    y = random.randint(0, height)
-    label.place(x=x, y=y)
+// 删除爱心
+function removeHeart(){
+    elements.forEach(e=>e.remove());
+    elements = [];
+}
 
-    # 自动消失
-    root.after(2000, label.destroy)
+// 随机文字
+function randomText(){
+    let el = document.createElement("div");
+    el.className = "text";
+    el.innerText = texts[Math.floor(Math.random()*texts.length)];
 
-    # 持续生成
-    root.after(150, random_text)
+    el.style.left = Math.random()*window.innerWidth + "px";
+    el.style.top = Math.random()*window.innerHeight + "px";
 
-# 执行流程
-create_heart()                 # 直接生成爱心
-root.after(3000, remove_heart) # 3秒后消失
-root.after(3200, random_text)  # 开始随机飘字
+    document.body.appendChild(el);
 
-root.mainloop()
+    setTimeout(()=>el.remove(),2000);
+}
+
+// 流程
+createHeart();                // 直接出现爱心
+setTimeout(removeHeart,3000); // 3秒消失
+setTimeout(()=>{
+    setInterval(randomText,150); // 随机出现
+},3200);
+
+</script>
+
+</body>
+</html>
