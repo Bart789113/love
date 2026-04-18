@@ -8,20 +8,49 @@ body {
     margin: 0;
     background: black;
     overflow: hidden;
+    font-family: "微软雅黑";
 }
 
-/* 文字卡片 */
-.text {
+/* 卡片整体 */
+.card {
     position: absolute;
-    padding: 6px 14px;
     border-radius: 8px;
-    font-size: 16px;
-    color: white;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
     opacity: 0;
     transform: scale(0.5);
     transition: all 0.3s;
 }
 
+/* 顶部栏 */
+.bar {
+    height: 20px;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+}
+
+/* 三个按钮 */
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+.red { background: #ff5f57; }
+.yellow { background: #ffbd2e; }
+.green { background: #28c840; }
+
+/* 内容 */
+.content {
+    padding: 6px 12px;
+    color: white;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+/* 显示动画 */
 .show {
     opacity: 1;
     transform: scale(1);
@@ -50,7 +79,41 @@ function heart(t) {
     return {x,y};
 }
 
-// ❤️ 顺序生成爱心
+// 创建卡片
+function createCard(text) {
+    let card = document.createElement("div");
+    card.className = "card";
+
+    let bar = document.createElement("div");
+    bar.className = "bar";
+
+    let red = document.createElement("div");
+    red.className = "dot red";
+
+    let yellow = document.createElement("div");
+    yellow.className = "dot yellow";
+
+    let green = document.createElement("div");
+    green.className = "dot green";
+
+    bar.appendChild(red);
+    bar.appendChild(yellow);
+    bar.appendChild(green);
+
+    let content = document.createElement("div");
+    content.className = "content";
+    content.innerText = text;
+
+    // 随机背景色
+    content.style.background = colors[Math.floor(Math.random()*colors.length)];
+
+    card.appendChild(bar);
+    card.appendChild(content);
+
+    return card;
+}
+
+// ❤️ 爱心生成（顺序）
 function createHeart() {
     let i = 0;
     let total = 180;
@@ -64,21 +127,18 @@ function createHeart() {
         let t = (i / total) * Math.PI * 2;
         let p = heart(t);
 
-        let el = document.createElement("div");
-        el.className = "text";
-        el.innerText = texts[i % texts.length];
+        let card = createCard(texts[i % texts.length]);
 
-        el.style.background = colors[Math.floor(Math.random()*colors.length)];
-        el.style.left = (window.innerWidth/2 + p.x*11) + "px";
-        el.style.top = (window.innerHeight/2 + p.y*11) + "px";
+        card.style.left = (window.innerWidth/2 + p.x*11) + "px";
+        card.style.top = (window.innerHeight/2 + p.y*11) + "px";
 
-        document.body.appendChild(el);
-        elements.push(el);
+        document.body.appendChild(card);
+        elements.push(card);
 
-        setTimeout(()=>el.classList.add("show"),10);
+        setTimeout(()=>card.classList.add("show"),10);
 
         i++;
-    },15); // 更快生成
+    },15);
 }
 
 // 💥 爱心消失
@@ -90,39 +150,34 @@ function removeHeart(){
     },300);
 }
 
-// 🔥 高密度飘字（重点优化）
-function randomText(){
-    // 一次生成多个（提高密度）
+// 🔥 随机卡片（高密度）
+function randomCards(){
     for(let i=0;i<5;i++){
+        let card = createCard(texts[Math.floor(Math.random()*texts.length)]);
 
-        let el = document.createElement("div");
-        el.className = "text show";
-        el.innerText = texts[Math.floor(Math.random()*texts.length)];
+        card.style.left = Math.random()*window.innerWidth + "px";
+        card.style.top = Math.random()*window.innerHeight + "px";
 
-        el.style.background = colors[Math.floor(Math.random()*colors.length)];
+        // 随机大小（更像抖音）
+        card.style.transform = "scale(" + (0.8 + Math.random()*0.8) + ")";
 
-        // 字体更大（重点）
-        el.style.fontSize = (18 + Math.random()*12) + "px";
+        document.body.appendChild(card);
 
-        el.style.left = Math.random()*window.innerWidth + "px";
-        el.style.top = Math.random()*window.innerHeight + "px";
+        setTimeout(()=>card.classList.add("show"),10);
 
-        document.body.appendChild(el);
-
-        // 自动消失
+        // 消失
         setTimeout(()=>{
-            el.style.opacity = 0;
-            setTimeout(()=>el.remove(),300);
+            card.style.opacity = 0;
+            setTimeout(()=>card.remove(),300);
         },1500);
     }
 }
 
-// 🚀 执行流程
-createHeart();                     // 爱心
-setTimeout(removeHeart,4000);      // 消失
+// 🚀 执行
+createHeart();
+setTimeout(removeHeart,4000);
 setTimeout(()=>{
-    // 高频率 + 多生成 = 爆满屏
-    setInterval(randomText,80);
+    setInterval(randomCards,80);
 },4200);
 
 </script>
