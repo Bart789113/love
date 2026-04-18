@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>爱心代码</title>
+<style>
+body{
+    margin:0;
+    background:#000;
+    overflow:hidden;
+    font-family: "微软雅黑";
+}
+
+.box{
+    position:absolute;
+    padding:5px 10px;
+    border-radius:6px;
+    font-size:14px;
+    color:#000;
+    background:linear-gradient(45deg,#a0e9ff,#ffafcc);
+    white-space:nowrap;
+    transition:all 1s;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+
+// 文字内容（你可以改）
+let texts = [
+    "我喜欢你","爱你","早点睡","别熬夜",
+    "考试顺利","天天开心","我想你了",
+    "多喝水","照顾好自己","争气",
+    "爱你老婆","加油","抱抱你"
+];
+
+// 爱心函数
+function heart(t){
+    let x = 16 * Math.pow(Math.sin(t),3);
+    let y = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+    return {x:x, y:y};
+}
+
+let boxes = [];
+
+// 创建文字块
+for(let i=0;i<120;i++){
+    let div = document.createElement("div");
+    div.className = "box";
+    div.innerText = texts[Math.floor(Math.random()*texts.length)];
+
+    // 初始随机位置
+    div.style.left = Math.random()*window.innerWidth+"px";
+    div.style.top = Math.random()*window.innerHeight+"px";
+
+    document.body.appendChild(div);
+    boxes.push(div);
+}
+
+// 聚合成爱心
+function toHeart(){
+    boxes.forEach((box,i)=>{
+        let t = Math.PI*2*i/boxes.length;
+        let pos = heart(t);
+
+        let x = pos.x * 15 + window.innerWidth/2;
+        let y = pos.y * 15 + window.innerHeight/2;
+
+        box.style.left = x+"px";
+        box.style.top = y+"px";
+    });
+}
+
+// 散开
+function randomMove(){
+    boxes.forEach(box=>{
+        box.style.left = Math.random()*window.innerWidth+"px";
+        box.style.top = Math.random()*window.innerHeight+"px";
+    });
+}
+
+// 动画循环
+setInterval(()=>{
+    toHeart();
+    setTimeout(randomMove,2000);
+},4000);
+
+</script>
+
+</body>
+</html>
