@@ -1,141 +1,73 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-<meta charset="UTF-8">
-<title>❤️ 给你的小惊喜</title>
+import tkinter as tk
+import random
+import math
 
-<style>
-body{
-  margin:0;
-  overflow:hidden;
-  background:black;
-  font-family:"微软雅黑";
-}
+# 文本内容（可以自己改）
+texts = [
+    "我想你了", "爱你", "好好吃饭", "早点睡",
+    "保持开心", "天天开心", "顺顺利利",
+    "我在", "别熬夜", "爱你哦"
+]
 
-/* 背景渐变流动 */
-body::before{
-  content:"";
-  position:fixed;
-  width:200%;
-  height:200%;
-  background:linear-gradient(45deg,#ff0057,#00f0ff,#ff0,#ff0057);
-  animation:bg 10s linear infinite;
-  z-index:-1;
-  opacity:0.2;
-}
-@keyframes bg{
-  0%{transform:translate(0,0);}
-  50%{transform:translate(-50%,-50%);}
-  100%{transform:translate(0,0);}
-}
+root = tk.Tk()
+root.title("❤️")
+root.attributes("-fullscreen", True)
+root.configure(bg="black")
 
-/* 中间文字 */
-.center{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  color:#fff;
-  font-size:30px;
-  text-align:center;
-  text-shadow:0 0 20px #ff4d6d;
-}
+width = root.winfo_screenwidth()
+height = root.winfo_screenheight()
 
-/* 爱心 */
-.heart{
-  position:absolute;
-  width:10px;
-  height:10px;
-  background:red;
-  transform:rotate(45deg);
-}
+labels = []
 
-.heart::before,
-.heart::after{
-  content:"";
-  position:absolute;
-  width:10px;
-  height:10px;
-  background:red;
-  border-radius:50%;
-}
+# ❤️ 生成爱心坐标（直接成型）
+def heart_points(scale=12):
+    points = []
+    for t in range(0, 360, 5):
+        t = math.radians(t)
+        x = 16 * math.sin(t)**3
+        y = -(13 * math.cos(t)
+              - 5 * math.cos(2*t)
+              - 2 * math.cos(3*t)
+              - math.cos(4*t))
+        points.append((x * scale + width/2, y * scale + height/2))
+    return points
 
-.heart::before{ top:-5px;}
-.heart::after{ left:-5px;}
+# 🎯 创建爱心（直接出现）
+def create_heart():
+    pts = heart_points()
+    for (x, y) in pts:
+        text = random.choice(texts)
+        label = tk.Label(root, text=text,
+                         fg=random.choice(["#ff4d6d","#ff66cc","#66ffcc","#ffff66","#66ccff"]),
+                         bg="black", font=("微软雅黑", 12))
+        label.place(x=x, y=y)
+        labels.append(label)
 
-/* 飘字 */
-.text{
-  position:absolute;
-  color:#fff;
-  font-size:14px;
-  white-space:nowrap;
-  animation:float 10s linear infinite;
-}
+# 💥 爱心直接消失
+def remove_heart():
+    for lbl in labels:
+        lbl.destroy()
+    labels.clear()
 
-@keyframes float{
-  0%{transform:translateY(100vh);opacity:1;}
-  100%{transform:translateY(-100vh);opacity:0;}
-}
-</style>
-</head>
+# 🎲 随机飘字
+def random_text():
+    text = random.choice(texts)
+    label = tk.Label(root, text=text,
+                     fg=random.choice(["#ff4d6d","#ff66cc","#66ffcc","#ffff66","#66ccff"]),
+                     bg="black", font=("微软雅黑", random.randint(10,18)))
+    x = random.randint(0, width)
+    y = random.randint(0, height)
+    label.place(x=x, y=y)
 
-<body>
+    # 自动消失
+    root.after(2000, label.destroy)
 
-<!-- 音乐 -->
-<audio autoplay loop>
-  <source src="https://www.ytmp3.cn/down/73388.mp3" type="audio/mpeg">
-</audio>
+    # 持续生成
+    root.after(150, random_text)
 
-<div class="center" id="text"></div>
+# 执行流程
+create_heart()                 # 直接生成爱心
+root.after(3000, remove_heart) # 3秒后消失
+root.after(3200, random_text)  # 开始随机飘字
 
-<script>
-// 打字效果
-let str="❤️ 我喜欢你 ❤️";
-let i=0;
-function typing(){
-  if(i<str.length){
-    document.getElementById("text").innerHTML+=str[i];
-    i++;
-    setTimeout(typing,150);
-  }
-}
-typing();
-
-// 飘字
-let words=["我爱你","喜欢你","❤️","永远在一起","Love"];
-setInterval(()=>{
-  let t=document.createElement("div");
-  t.className="text";
-  t.innerText=words[Math.floor(Math.random()*words.length)];
-  t.style.left=Math.random()*window.innerWidth+"px";
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),10000);
-},500);
-
-// 点击生成爱心爆炸
-document.onclick=function(e){
-  for(let i=0;i<20;i++){
-    let heart=document.createElement("div");
-    heart.className="heart";
-    heart.style.left=e.clientX+"px";
-    heart.style.top=e.clientY+"px";
-    heart.style.background=`hsl(${Math.random()*360},100%,60%)`;
-    document.body.appendChild(heart);
-
-    let x=(Math.random()-0.5)*200;
-    let y=(Math.random()-0.5)*200;
-
-    heart.animate([
-      {transform:`translate(0,0) rotate(45deg)`,opacity:1},
-      {transform:`translate(${x}px,${y}px) rotate(45deg)`,opacity:0}
-    ],{
-      duration:1000
-    });
-
-    setTimeout(()=>heart.remove(),1000);
-  }
-};
-</script>
-
-</body>
-</html>
+root.mainloop()
