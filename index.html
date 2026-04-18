@@ -9,71 +9,120 @@ body {
     background: black;
     overflow: hidden;
 }
+
+/* 文字卡片 */
 .text {
     position: absolute;
+    padding: 5px 10px;
+    border-radius: 6px;
     font-size: 14px;
-    color: pink;
+    color: white;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s;
+}
+
+/* 出现动画 */
+.show {
+    opacity: 1;
+    transform: scale(1);
 }
 </style>
 </head>
 <body>
 
 <script>
-const texts = ["我想你了","爱你","早点睡","好好吃饭","我在","别熬夜","天天开心"];
+const texts = [
+    "我想你了","爱你","好好吃饭","早点睡",
+    "保持开心","天天开心","顺顺利利",
+    "我在","别熬夜","爱你哦"
+];
+
+const colors = [
+    "#ff4d6d","#ff66cc","#66ffcc","#66ccff","#ffff66"
+];
 
 let elements = [];
 
-// ❤️ 爱心坐标
+// ❤️ 爱心函数
 function heart(t) {
     let x = 16 * Math.pow(Math.sin(t),3);
     let y = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
     return {x,y};
 }
 
-// 生成爱心（直接出现）
+// ❤️ 顺序生成爱心
 function createHeart() {
-    for(let i=0;i<200;i++){
-        let t = Math.random()*Math.PI*2;
+    let i = 0;
+    let total = 150;
+
+    let interval = setInterval(()=>{
+        if(i >= total){
+            clearInterval(interval);
+            return;
+        }
+
+        let t = (i / total) * Math.PI * 2;
         let p = heart(t);
 
         let el = document.createElement("div");
         el.className = "text";
-        el.innerText = texts[Math.floor(Math.random()*texts.length)];
+        el.innerText = texts[i % texts.length];
+
+        // 背景颜色
+        el.style.background = colors[Math.floor(Math.random()*colors.length)];
 
         el.style.left = (window.innerWidth/2 + p.x*10) + "px";
         el.style.top = (window.innerHeight/2 + p.y*10) + "px";
 
         document.body.appendChild(el);
         elements.push(el);
-    }
+
+        // 动画出现
+        setTimeout(()=>el.classList.add("show"),10);
+
+        i++;
+    },20); // 控制出现速度
 }
 
-// 删除爱心
+// 💥 爱心直接消失
 function removeHeart(){
-    elements.forEach(e=>e.remove());
-    elements = [];
+    elements.forEach(e=>{
+        e.style.opacity = 0;
+    });
+
+    setTimeout(()=>{
+        elements.forEach(e=>e.remove());
+        elements = [];
+    },300);
 }
 
-// 随机文字
+// 🎲 随机文字
 function randomText(){
     let el = document.createElement("div");
-    el.className = "text";
+    el.className = "text show";
     el.innerText = texts[Math.floor(Math.random()*texts.length)];
+
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
 
     el.style.left = Math.random()*window.innerWidth + "px";
     el.style.top = Math.random()*window.innerHeight + "px";
 
     document.body.appendChild(el);
 
-    setTimeout(()=>el.remove(),2000);
+    // 自动消失
+    setTimeout(()=>{
+        el.style.opacity = 0;
+        setTimeout(()=>el.remove(),300);
+    },2000);
 }
 
-// 流程
-createHeart();                // 直接出现爱心
-setTimeout(removeHeart,3000); // 3秒消失
+// 🚀 执行流程
+createHeart();                     // 顺序生成爱心
+setTimeout(removeHeart,4000);      // 消失
 setTimeout(()=>{
-    setInterval(randomText,150); // 随机出现
-},3200);
+    setInterval(randomText,150);   // 随机飘字
+},4300);
 
 </script>
 
